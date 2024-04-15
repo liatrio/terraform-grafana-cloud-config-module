@@ -1,9 +1,9 @@
 
-variable "aws_region" {
-  description = "Contains the AWS Region that Grafana is running in."
-  type        = string
-  default     = "us-east-1"
-}
+# variable "aws_region" {
+#   description = "Contains the AWS Region that Grafana is running in."
+#   type        = string
+#   default     = "us-east-1"
+# }
 
 variable "data_source_map" {
   description = "A list of maps representing datasource information. Each map defines a data source with its type, name, and url."
