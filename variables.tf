@@ -31,17 +31,17 @@ variable "grafana_url" {
   type        = string
 }
 
-variable "alarm_rules" {
-  description = "The contents of the alarm rules file."
-  type        = string
-}
+# variable "alarm_rules" {
+#   description = "The contents of the alarm rules file."
+#   type        = string
+# }
 
-variable "prometheus_workspace_id" {
-  description = "The workspace ID of the prometheus instance you wish to modify."
-  type        = string
-}
+# variable "prometheus_workspace_id" {
+#   description = "The workspace ID of the prometheus instance you wish to modify."
+#   type        = string
+# }
 
-variable "grafana_workspace_id" {
+variable "auth" {
   description = "The workspace ID of the grafana instance you wish to modify."
   type        = string
 }

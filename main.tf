@@ -28,7 +28,8 @@ locals {
 
 provider "grafana" {
   url  = var.grafana_url
-  auth = aws_grafana_workspace_api_key.key.key
+  #auth = aws_grafana_workspace_api_key.key.key
+  auth = var.auth
 }
 
 # resource "null_resource" "replace_trigger" {
@@ -37,20 +38,20 @@ provider "grafana" {
 #   }
 # }
 
-resource "aws_grafana_workspace_api_key" "key" {
-  key_name        = "amg_api_key_${uuid()}"
-  key_role        = "ADMIN"
-  seconds_to_live = 180
-  workspace_id    = var.grafana_workspace_id
-  lifecycle {
-    create_before_destroy = true
-  }
-  # lifecycle {
-  #   replace_triggered_by = [
-  #     null_resource.replace_trigger
-  #   ]
-  # }
-}
+# resource "aws_grafana_workspace_api_key" "key" {
+#   key_name        = "amg_api_key_${uuid()}"
+#   key_role        = "ADMIN"
+#   seconds_to_live = 180
+#   workspace_id    = var.grafana_workspace_id
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+#   # lifecycle {
+#   #   replace_triggered_by = [
+#   #     null_resource.replace_trigger
+#   #   ]
+#   # }
+# }
 
 resource "grafana_folder" "dashboard_folders" {
   for_each = toset(local.subfolder_names)
@@ -67,32 +68,33 @@ resource "grafana_dashboard" "dashboard_from_file" {
   config_json = file("${var.dashboard_configs_folder}/${each.key}")
 }
 
-resource "grafana_data_source" "data_source_from_map" {
-  for_each = { for item in var.data_source_map : item.data_source_name => item }
-  type     = each.value["data_source_type"]
-  name     = each.value["data_source_name"]
-  url      = each.value["data_source_url"]
+# resource "grafana_data_source" "data_source_from_map" {
+#   for_each = { for item in var.data_source_map : item.data_source_name => item }
+#   type     = each.value["data_source_type"]
+#   name     = each.value["data_source_name"]
+#   url      = each.value["data_source_url"]
 
-  # Giving priority to Managed Prometheus datasources
-  # TODO: The Key names are wrong in current implementation, should be camelcase and not snake case.
-  is_default = false
-  json_data_encoded = jsonencode({
-    default_region  = var.aws_region
-    httpMethod      = "POST"
-    sigV4Auth       = true
-    sigV4AuthType   = "ec2_iam_role"
-    sigV4Region     = var.aws_region
-    sigv4_auth      = true
-    sigv4_auth_type = "workspace-iam-role"
-    sigv4_region    = var.aws_region
-    manageAlerts    = false
-  })
-}
+#   # Giving priority to Managed Prometheus datasources
+#   # TODO: The Key names are wrong in current implementation, should be camelcase and not snake case.
+#   is_default = false
+#   json_data_encoded = jsonencode({
+#     default_region  = var.aws_region
+#     httpMethod      = "POST"
+#     sigV4Auth       = true
+#     sigV4AuthType   = "ec2_iam_role"
+#     sigV4Region     = var.aws_region
+#     sigv4_auth      = true
+#     sigv4_auth_type = "workspace-iam-role"
+#     sigv4_region    = var.aws_region
+#     manageAlerts    = false
+#   })
+# }
 
-# --------- Prometheus Configs --------- #
+# # --------- Prometheus Configs --------- #
 
-resource "aws_prometheus_rule_group_namespace" "alarm_rule" {
-  name         = "rules"
-  workspace_id = var.prometheus_workspace_id
-  data         = var.alarm_rules
-}
+# resource "aws_prometheus_rule_group_namespace" "alarm_rule" {
+#   name         = "rules"
+#   workspace_id = var.prometheus_workspace_id
+#   data         = var.alarm_rules
+# }
+
