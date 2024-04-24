@@ -1,0 +1,34 @@
+name: Trigger Tag-011y Grafana Deplopyment
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Workflow in Repository B
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const token = process.env.TOKEN; // Personal access token with repo scope
+            const repository = 'liatrio/tag-o11y-grafana-config'; // Repository B's name
+            const workflow = 'deploy.yml'; // Workflow file to trigger in Repository B
+
+            const { data: workflows } = await octokit.actions.listRepoWorkflows({ owner, repo: repository });
+            const workflowId = workflows.workflows.find(w => w.path === workflow).id;
+
+            await octokit.actions.createWorkflowDispatch({
+              owner,
+              repo: repository,
+              workflow_id: workflowId,
+              ref: 'main', // Branch to trigger the workflow on in Repository B
+              inputs: {
+                input1: 'value1', // Optional: Pass any input values required by the workflow in Repository B
+                input2: 'value2'
+              }
+            });
+        env:
+          TOKEN: ${{ secrets.TOKEN }}  # Personal access token with repo scope
